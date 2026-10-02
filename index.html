@@ -1,0 +1,1540 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>People Partner — Outil BizDev CRC-R</title>
+<style>
+:root {
+  --navy:   #1F2D3D;
+  --red:    #B5332E;
+  --purple: #673ab7;
+  --green:  #2E7D32;
+  --amber:  #E65100;
+  --blue:   #1565C0;
+  --grey:   #5f6368;
+  --light:  #F5F5F5;
+  --white:  #FFFFFF;
+  --card-shadow: 0 2px 12px rgba(0,0,0,0.09);
+
+  --c-color: #1565C0;
+  --r-color: #E65100;
+  --oe-color:#1976D2;
+  --os-color:#2E7D32;
+  --c-bg:   #E3F2FD;
+  --r-bg:   #FFF3E0;
+  --oe-bg:  #E8F4FD;
+  --os-bg:  #E8F5E9;
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+  font-family: 'Segoe UI', Arial, sans-serif;
+  background: #ECEFF1;
+  color: var(--navy);
+  min-height: 100vh;
+  padding-bottom: env(safe-area-inset-bottom, 0px);
+}
+
+/* ── NAV TOP ── */
+.nav {
+  background: var(--navy);
+  padding: 12px 20px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+}
+.nav-logo { color: #fff; font-size: 14px; font-weight: 700; letter-spacing: 0.3px; }
+
+/* Onglets dans la nav (desktop) */
+.nav-tabs { display: flex; gap: 4px; }
+.nav-tab {
+  color: rgba(255,255,255,0.65);
+  font-size: 12px; font-weight: 600;
+  padding: 6px 14px; border-radius: 6px;
+  cursor: pointer; border: none;
+  background: transparent; transition: all 0.15s;
+  font-family: inherit;
+}
+.nav-tab.active, .nav-tab:hover {
+  background: rgba(255,255,255,0.18);
+  color: #fff;
+}
+
+/* ── BOTTOM TAB BAR (mobile) ── */
+.bottom-tabs {
+  display: none;
+  position: fixed;
+  bottom: 0; left: 0; right: 0;
+  z-index: 200;
+  background: #fff;
+  border-top: 1px solid #e0e0e0;
+  padding-bottom: env(safe-area-inset-bottom, 0px);
+  box-shadow: 0 -2px 12px rgba(0,0,0,0.10);
+}
+.bottom-tabs-inner {
+  display: flex;
+}
+.btab {
+  flex: 1; display: flex; flex-direction: column;
+  align-items: center; justify-content: center;
+  padding: 10px 4px 8px;
+  cursor: pointer; border: none; background: transparent;
+  font-family: inherit; transition: all 0.15s;
+  color: #9e9e9e;
+  -webkit-tap-highlight-color: transparent;
+}
+.btab.active { color: var(--navy); }
+.btab-icon { font-size: 22px; line-height: 1; margin-bottom: 3px; }
+.btab-label { font-size: 10px; font-weight: 700; letter-spacing: 0.3px; }
+.btab.active .btab-label { color: var(--navy); }
+
+/* Sur mobile : masquer nav-tabs, afficher bottom-tabs, ajouter padding bas */
+@media (max-width: 700px) {
+  .nav-tabs { display: none; }
+  .bottom-tabs { display: block; }
+  body { padding-bottom: calc(68px + env(safe-area-inset-bottom, 0px)); }
+  .section { padding: 16px 12px; }
+}
+
+/* ── SECTIONS ── */
+.section { display: none; padding: 28px 20px; max-width: 1100px; margin: 0 auto; }
+.section.active { display: block; }
+
+/* ── HERO ── */
+.hero {
+  background: linear-gradient(135deg, var(--navy) 0%, #2c3e50 100%);
+  border-radius: 16px;
+  padding: 36px 32px;
+  color: #fff;
+  margin-bottom: 24px;
+  position: relative;
+  overflow: hidden;
+}
+.hero::before {
+  content: '';
+  position: absolute;
+  right: -40px; top: -40px;
+  width: 200px; height: 200px;
+  border-radius: 50%;
+  background: rgba(255,255,255,0.04);
+}
+.hero-eyebrow { font-size: 11px; font-weight: 700; letter-spacing: 2px; color: var(--red); text-transform: uppercase; margin-bottom: 10px; }
+.hero-title { font-size: 26px; font-weight: 700; line-height: 1.25; margin-bottom: 10px; }
+.hero-sub { font-size: 14px; color: rgba(255,255,255,0.7); line-height: 1.6; max-width: 580px; }
+.hero-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: rgba(255,255,255,0.12);
+  border: 1px solid rgba(255,255,255,0.2);
+  border-radius: 20px;
+  padding: 6px 14px;
+  font-size: 12px;
+  margin-top: 16px;
+  color: rgba(255,255,255,0.85);
+}
+
+/* ── CARDS GRID ── */
+.grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+.grid-3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; }
+@media (max-width: 700px) {
+  .grid-2, .grid-3 { grid-template-columns: 1fr; }
+}
+
+.card {
+  background: var(--white);
+  border-radius: 12px;
+  padding: 20px;
+  box-shadow: var(--card-shadow);
+}
+.card-title { font-size: 13px; font-weight: 700; color: var(--navy); margin-bottom: 6px; }
+.card-sub { font-size: 12px; color: var(--grey); line-height: 1.5; }
+
+/* ── PROBLÈME / SOLUTION ── */
+.pb-sol {
+  display: grid;
+  grid-template-columns: 1fr 48px 1fr;
+  gap: 0;
+  align-items: center;
+  margin-bottom: 24px;
+}
+.pb-block {
+  background: #fff;
+  border-radius: 12px;
+  padding: 20px;
+  box-shadow: var(--card-shadow);
+}
+.pb-block.prob { border-left: 4px solid #c62828; }
+.pb-block.sol  { border-left: 4px solid var(--green); }
+.pb-label { font-size: 10px; font-weight: 700; letter-spacing: 1.5px; text-transform: uppercase; margin-bottom: 8px; }
+.pb-label.prob { color: #c62828; }
+.pb-label.sol  { color: var(--green); }
+.pb-item { font-size: 13px; color: var(--grey); padding: 4px 0; border-bottom: 1px solid #f0f0f0; line-height: 1.4; }
+.pb-item:last-child { border-bottom: none; }
+.arrow-mid { text-align: center; font-size: 24px; color: var(--navy); }
+
+/* ── SECTION TITLE ── */
+.sec-title {
+  font-size: 18px;
+  font-weight: 700;
+  color: var(--navy);
+  margin-bottom: 16px;
+  padding-bottom: 8px;
+  border-bottom: 2px solid var(--red);
+  display: inline-block;
+}
+.sec-wrap { margin-bottom: 32px; }
+
+/* ══════════ DEMO SECTION ══════════ */
+
+/* ── PHONE ── */
+.demo-layout {
+  display: grid;
+  grid-template-columns: 380px 1fr;
+  gap: 24px;
+  align-items: start;
+}
+@media (max-width: 800px) {
+  .demo-layout { grid-template-columns: 1fr; }
+}
+
+.phone-wrap { display: flex; flex-direction: column; align-items: center; gap: 10px; }
+.phone-label {
+  font-size: 11px; font-weight: 700; letter-spacing: 1.5px;
+  text-transform: uppercase; color: var(--grey);
+}
+
+.phone {
+  width: 320px;
+  background: #111;
+  border-radius: 42px;
+  padding: 10px;
+  box-shadow: 0 0 0 2px #2a2a2a, 0 24px 60px rgba(0,0,0,0.4);
+  flex-shrink: 0;
+}
+.phone-screen {
+  background: #fff;
+  border-radius: 33px;
+  overflow: hidden;
+  min-height: 580px;
+  display: flex;
+  flex-direction: column;
+  position: relative;
+}
+.notch {
+  height: 28px; background: #fff;
+  display: flex; justify-content: center; align-items: flex-end;
+}
+.notch-pill {
+  width: 90px; height: 22px; background: #111;
+  border-radius: 0 0 14px 14px;
+  display: flex; align-items: center; justify-content: center; gap: 5px;
+}
+.notch-cam { width: 8px; height: 8px; background: #222; border-radius: 50%; }
+.notch-sensor { width: 6px; height: 4px; background: #1a1a2e; border-radius: 2px; }
+.status-bar {
+  display: flex; justify-content: space-between; align-items: center;
+  padding: 2px 14px 3px; font-size: 10px; font-weight: 700; color: #111;
+}
+
+/* Google Forms UI */
+.gf-header {
+  background: var(--purple);
+  padding: 12px 14px 14px;
+}
+.gf-app-label { font-size: 10px; color: rgba(255,255,255,0.65); margin-bottom: 2px; }
+.gf-title { font-size: 15px; font-weight: 700; color: #fff; }
+.gf-sub { font-size: 11px; color: rgba(255,255,255,0.7); margin-top: 2px; }
+.gf-progress { height: 3px; background: rgba(255,255,255,0.2); border-radius: 2px; margin-top: 8px; overflow: hidden; }
+.gf-progress-fill {
+  height: 100%; background: #fff; border-radius: 2px;
+  transition: width 0.4s ease;
+  width: 0%;
+}
+
+.gf-body {
+  flex: 1; background: #f5f5f5;
+  padding: 10px 10px 70px;
+  display: flex; flex-direction: column; gap: 8px;
+  overflow-y: auto;
+}
+
+.gf-card {
+  background: #fff; border-radius: 8px;
+  padding: 12px 12px 10px;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.07);
+  border-left: 3px solid transparent;
+  transition: border-color 0.2s;
+}
+.gf-card.active { border-left-color: var(--purple); }
+.gf-card.done   { border-left-color: #4caf50; }
+
+.gf-q { font-size: 12px; font-weight: 600; color: #202124; margin-bottom: 6px; }
+.gf-req { color: #d93025; }
+
+.gf-input {
+  width: 100%;
+  border: none;
+  border-bottom: 1.5px solid #dadce0;
+  padding: 4px 0;
+  font-size: 13px; color: #202124;
+  outline: none; background: transparent;
+  font-family: inherit;
+}
+.gf-input.filled { border-bottom-color: #4caf50; }
+
+.action-list { display: flex; flex-direction: column; gap: 5px; }
+.action-item {
+  display: flex; align-items: center; gap: 8px;
+  padding: 8px 10px; border-radius: 6px;
+  border: 1.5px solid #e8e8e8;
+  font-size: 12px; font-weight: 500; color: #202124;
+  cursor: pointer; transition: all 0.15s;
+  background: #fafafa;
+}
+.action-item:hover { background: #f3e5f5; border-color: var(--purple); }
+.action-item.selected { background: #f3e5f5; border-color: var(--purple); color: #4a148c; }
+.action-dot { width: 9px; height: 9px; border-radius: 50%; flex-shrink: 0; }
+
+.gf-textarea {
+  width: 100%;
+  border: none; border-bottom: 1.5px solid #dadce0;
+  padding: 4px 0; font-size: 12px; color: #202124;
+  outline: none; background: transparent; resize: none;
+  font-family: inherit; min-height: 36px;
+}
+
+/* Champ montant conditionnel */
+.gf-amount-wrap {
+  display: none;
+}
+.gf-amount-wrap.visible { display: block; }
+.gf-amount-row {
+  display: flex; align-items: center; gap: 6px;
+}
+.gf-currency {
+  font-size: 14px; font-weight: 700; color: #2E7D32; flex-shrink: 0;
+}
+
+/* KPI CA */
+.ca-banner {
+  background: linear-gradient(135deg, #1b5e20, #2E7D32);
+  border-radius: 12px; padding: 18px 22px;
+  color: #fff; margin-bottom: 20px;
+  display: flex; align-items: center; justify-content: space-between;
+  box-shadow: 0 4px 16px rgba(46,125,50,0.3);
+}
+.ca-label { font-size: 12px; font-weight: 700; letter-spacing: 1px; text-transform: uppercase; opacity: 0.8; margin-bottom: 4px; }
+.ca-value { font-size: 38px; font-weight: 800; line-height: 1; }
+.ca-sub   { font-size: 11px; opacity: 0.7; margin-top: 4px; }
+.ca-icon  { font-size: 48px; opacity: 0.3; }
+.ca-trend {
+  display: flex; align-items: center; gap: 6px;
+  background: rgba(255,255,255,0.15); border-radius: 8px;
+  padding: 6px 12px; font-size: 12px; font-weight: 700;
+}
+
+/* Colonne CA dans le tableau — maintenant 7 colonnes avec objectif contacts */
+.ct-header { grid-template-columns: 1fr 100px 70px 70px 70px 90px !important; }
+.ct-row    { grid-template-columns: 1fr 100px 70px 70px 70px 90px !important; }
+.ct-total-row { grid-template-columns: 1fr 100px 70px 70px 70px 90px !important; }
+.ct-ca-cell {
+  font-size: 12px; font-weight: 700; color: #2E7D32;
+  text-align: right; padding-right: 6px;
+}
+
+/* Barre progression CA global */
+.ca-progress-wrap { margin-top: 12px; }
+.ca-progress-label {
+  display: flex; justify-content: space-between;
+  font-size: 11px; color: rgba(255,255,255,0.8); margin-bottom: 5px;
+}
+.ca-progress-bg {
+  height: 8px; background: rgba(255,255,255,0.2);
+  border-radius: 4px; overflow: hidden;
+}
+.ca-progress-fill {
+  height: 100%; border-radius: 4px;
+  transition: width 0.8s cubic-bezier(0.4,0,0.2,1);
+}
+
+/* Mini-progress contacts individuels */
+.contact-cell { display: flex; flex-direction: column; gap: 3px; align-items: center; }
+.contact-val  { font-size: 13px; font-weight: 700; }
+.contact-mini-bar { width: 48px; height: 5px; background: #e8e8e8; border-radius: 3px; overflow: hidden; }
+.contact-mini-fill { height: 100%; border-radius: 3px; transition: width 0.6s ease; }
+.contact-obj  { font-size: 9px; color: #aaa; }
+
+/* Panneau objectifs */
+.obj-panel {
+  background: #fff; border-radius: 12px;
+  box-shadow: var(--card-shadow); overflow: hidden; margin-bottom: 20px;
+}
+.obj-panel-header {
+  background: var(--navy); padding: 12px 18px;
+  display: flex; justify-content: space-between; align-items: center;
+}
+.obj-panel-title { font-size: 13px; font-weight: 700; color: #fff; }
+.obj-panel-hint  { font-size: 11px; color: rgba(255,255,255,0.55); }
+.obj-grid {
+  display: grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+  gap: 0; padding: 0;
+}
+.obj-row {
+  padding: 12px 16px; border-bottom: 1px solid #f0f0f0; border-right: 1px solid #f0f0f0;
+  display: flex; flex-direction: column; gap: 6px;
+}
+.obj-name { font-size: 12px; font-weight: 700; color: var(--navy); }
+.obj-input-row { display: flex; align-items: center; gap: 6px; }
+.obj-input-label { font-size: 10px; color: var(--grey); min-width: 80px; }
+.obj-input {
+  width: 70px; border: 1.5px solid #e0e0e0; border-radius: 6px;
+  padding: 4px 8px; font-size: 12px; font-weight: 700;
+  font-family: inherit; color: var(--navy); text-align: right;
+  transition: border-color 0.15s;
+}
+.obj-input:focus { outline: none; border-color: var(--navy); }
+.obj-input.ca-input { color: var(--green); border-color: #a5d6a7; width: 90px; }
+.obj-ca-row {
+  background: #f9f9f9; padding: 14px 18px;
+  display: flex; align-items: center; justify-content: space-between;
+  border-top: 2px solid #eee;
+}
+.obj-ca-label { font-size: 12px; font-weight: 700; color: var(--navy); }
+.obj-save-btn {
+  background: var(--navy); color: #fff; border: none; border-radius: 6px;
+  padding: 8px 18px; font-size: 12px; font-weight: 700; cursor: pointer;
+  font-family: inherit; transition: background 0.15s;
+}
+.obj-save-btn:hover { background: #2c3e50; }
+
+.gf-footer {
+  position: absolute; bottom: 0; left: 0; right: 0;
+  background: #fff; border-top: 1px solid #eee;
+  padding: 8px 14px;
+  display: flex; justify-content: space-between; align-items: center;
+  border-radius: 0 0 33px 33px;
+}
+.gf-clear { font-size: 12px; color: var(--purple); font-weight: 600; cursor: pointer; }
+.gf-submit {
+  background: var(--purple); color: #fff;
+  border: none; border-radius: 4px;
+  padding: 8px 18px; font-size: 13px; font-weight: 700;
+  cursor: pointer; transition: background 0.15s;
+  font-family: inherit;
+}
+.gf-submit:hover { background: #4a148c; }
+
+/* Confirm screen */
+.gf-confirm {
+  display: none;
+  flex-direction: column; align-items: center; justify-content: center;
+  text-align: center; padding: 32px 20px; gap: 12px; flex: 1;
+}
+.confirm-icon { font-size: 44px; }
+.confirm-title { font-size: 15px; font-weight: 700; color: #202124; }
+.confirm-detail {
+  background: #f3e5f5; border-radius: 8px;
+  padding: 10px 16px; font-size: 11px; color: #4a148c; line-height: 1.7;
+}
+.confirm-another {
+  font-size: 12px; color: var(--purple); font-weight: 700; cursor: pointer;
+  padding: 6px 0;
+}
+
+/* ── FEED (droite du démo) ── */
+.demo-right { display: flex; flex-direction: column; gap: 16px; }
+
+.feed-card {
+  background: #fff; border-radius: 12px;
+  padding: 16px 18px; box-shadow: var(--card-shadow);
+}
+.feed-title { font-size: 13px; font-weight: 700; color: var(--navy); margin-bottom: 12px; display: flex; align-items: center; gap: 8px; }
+.live-dot {
+  width: 8px; height: 8px; border-radius: 50%; background: #43a047;
+  animation: pulse 1.5s ease-in-out infinite;
+  display: inline-block;
+}
+@keyframes pulse {
+  0%,100% { opacity: 1; transform: scale(1); }
+  50% { opacity: 0.5; transform: scale(0.8); }
+}
+
+.entry-item {
+  display: flex; align-items: center; gap: 10px;
+  padding: 7px 0; border-bottom: 1px solid #f0f0f0;
+  animation: slideIn 0.3s ease;
+}
+@keyframes slideIn {
+  from { opacity: 0; transform: translateX(-8px); }
+  to   { opacity: 1; transform: translateX(0); }
+}
+.entry-item:last-child { border-bottom: none; }
+.entry-dot { width: 10px; height: 10px; border-radius: 50%; flex-shrink: 0; }
+.entry-text { flex: 1; font-size: 12px; color: #333; }
+.entry-name { font-weight: 700; }
+.entry-time { font-size: 10px; color: #aaa; flex-shrink: 0; }
+.entry-empty { font-size: 12px; color: #aaa; text-align: center; padding: 16px 0; }
+
+/* ══════════ DASHBOARD SECTION ══════════ */
+
+/* KPI cards */
+.kpi-row { display: grid; grid-template-columns: repeat(4,1fr); gap: 12px; margin-bottom: 20px; }
+@media (max-width: 600px) { .kpi-row { grid-template-columns: repeat(2,1fr); } }
+
+.kpi-card {
+  border-radius: 12px; padding: 16px;
+  text-align: center; box-shadow: var(--card-shadow);
+  transition: transform 0.15s;
+}
+.kpi-card:hover { transform: translateY(-2px); }
+.kpi-label { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.8px; margin-bottom: 4px; }
+.kpi-value { font-size: 36px; font-weight: 800; line-height: 1; margin: 6px 0; }
+.kpi-sub { font-size: 10px; opacity: 0.75; }
+
+/* Funnel bar */
+.funnel-row {
+  background: #fff; border-radius: 12px;
+  padding: 20px; box-shadow: var(--card-shadow); margin-bottom: 20px;
+}
+.funnel-title { font-size: 13px; font-weight: 700; color: var(--navy); margin-bottom: 16px; }
+.funnel-step { margin-bottom: 10px; }
+.funnel-step-header { display: flex; justify-content: space-between; font-size: 12px; margin-bottom: 4px; }
+.funnel-step-name { font-weight: 700; }
+.funnel-step-val { color: var(--grey); }
+.funnel-bar-bg { height: 10px; background: #f0f0f0; border-radius: 5px; overflow: hidden; }
+.funnel-bar-fill { height: 100%; border-radius: 5px; transition: width 0.8s cubic-bezier(0.4,0,0.2,1); }
+
+/* Chart area */
+.chart-row {
+  background: #fff; border-radius: 12px;
+  padding: 20px; box-shadow: var(--card-shadow); margin-bottom: 20px;
+}
+.chart-title { font-size: 13px; font-weight: 700; color: var(--navy); margin-bottom: 4px; }
+.chart-sub { font-size: 11px; color: var(--grey); margin-bottom: 16px; }
+
+.chart-area {
+  position: relative;
+  height: 180px;
+}
+.chart-svg { width: 100%; height: 100%; }
+
+/* Consultant table */
+.consultant-table {
+  background: #fff; border-radius: 12px;
+  box-shadow: var(--card-shadow); overflow: hidden; margin-bottom: 20px;
+}
+.ct-header {
+  display: grid; grid-template-columns: 1fr 80px 80px 80px 80px;
+  background: var(--navy);
+  padding: 10px 16px; gap: 8px;
+}
+.ct-hcell { font-size: 11px; font-weight: 700; color: #fff; text-align: center; }
+.ct-hcell:first-child { text-align: left; }
+.ct-row {
+  display: grid; grid-template-columns: 1fr 80px 80px 80px 80px;
+  padding: 9px 16px; border-bottom: 1px solid #f0f0f0; gap: 8px;
+  align-items: center; transition: background 0.1s;
+}
+.ct-row:hover { background: #f9f9f9; }
+.ct-row:last-child { border-bottom: none; }
+.ct-name { font-size: 12px; font-weight: 700; color: var(--navy); }
+.ct-cell {
+  font-size: 13px; font-weight: 700; text-align: center;
+  border-radius: 4px; padding: 2px 4px;
+}
+.ct-total-row {
+  display: grid; grid-template-columns: 1fr 80px 80px 80px 80px;
+  padding: 10px 16px; background: var(--red); gap: 8px; align-items: center;
+}
+.ct-total-label { font-size: 12px; font-weight: 700; color: #fff; }
+.ct-total-cell { font-size: 14px; font-weight: 800; color: #fff; text-align: center; }
+
+/* Month selector */
+.month-bar {
+  display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 16px;
+}
+.month-btn {
+  padding: 6px 14px; border-radius: 20px;
+  border: 2px solid #e0e0e0; background: #fff;
+  font-size: 12px; font-weight: 600; cursor: pointer;
+  transition: all 0.15s; font-family: inherit; color: var(--grey);
+}
+.month-btn.active {
+  background: var(--navy); border-color: var(--navy);
+  color: #fff;
+}
+
+/* ── STEP FLOW ── */
+.steps-row {
+  display: flex; gap: 0; align-items: stretch;
+  background: #fff; border-radius: 12px;
+  box-shadow: var(--card-shadow); overflow: hidden;
+  margin-bottom: 24px;
+}
+.step-block {
+  flex: 1; padding: 18px 14px; text-align: center;
+  border-right: 1px solid #f0f0f0; position: relative;
+}
+.step-block:last-child { border-right: none; }
+.step-num {
+  width: 28px; height: 28px; border-radius: 50%;
+  background: var(--navy); color: #fff;
+  font-size: 13px; font-weight: 700;
+  display: flex; align-items: center; justify-content: center;
+  margin: 0 auto 8px;
+}
+.step-title { font-size: 12px; font-weight: 700; color: var(--navy); margin-bottom: 4px; }
+.step-desc { font-size: 11px; color: var(--grey); line-height: 1.4; }
+
+/* ── TOAST ── */
+.toast {
+  position: fixed; bottom: 20px; right: 20px;
+  background: var(--navy); color: #fff;
+  padding: 10px 18px; border-radius: 8px;
+  font-size: 13px; font-weight: 600;
+  box-shadow: 0 4px 16px rgba(0,0,0,0.25);
+  z-index: 1000;
+  transform: translateY(60px); opacity: 0;
+  transition: all 0.3s ease;
+  pointer-events: none;
+}
+.toast.show { transform: translateY(0); opacity: 1; }
+
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav class="nav">
+  <div>
+    <div class="nav-logo">People Partner — Outil BizDev CRC-R</div>
+  </div>
+  <div class="nav-tabs">
+    <button class="nav-tab active" onclick="showSection('demo')">📱 Formulaire</button>
+    <button class="nav-tab" onclick="showSection('dashboard')">📊 Dashboard</button>
+    <button class="nav-tab" onclick="showSection('setup')">⚙️ Mise en place</button>
+  </div>
+</nav>
+
+<!-- BOTTOM TAB BAR (mobile) -->
+<div class="bottom-tabs">
+  <div class="bottom-tabs-inner">
+    <button class="btab active" id="btab-demo" onclick="showSection('demo')">
+      <div class="btab-icon">📱</div>
+      <div class="btab-label">Formulaire</div>
+    </button>
+    <button class="btab" id="btab-dashboard" onclick="showSection('dashboard')">
+      <div class="btab-icon">📊</div>
+      <div class="btab-label">Dashboard</div>
+    </button>
+    <button class="btab" id="btab-setup" onclick="showSection('setup')">
+      <div class="btab-icon">⚙️</div>
+      <div class="btab-label">Setup</div>
+    </button>
+  </div>
+</div>
+
+<!-- ══════════ SECTION 1 : CONTEXTE (masquée) ══════════ -->
+<div class="section" id="sec-context">
+  <div class="hero">
+    <div class="hero-eyebrow">Proposition BizDev · People Partner</div>
+    <div class="hero-title">Un outil de suivi commercial<br>aussi simple que d'envoyer un SMS</div>
+    <div class="hero-sub">Sans recrutement commercial dédié, la performance BizDev repose sur les 4 associés. Cet outil rend leur activité visible, mesurable, et utile en réunion mensuelle — avec zéro friction à la saisie.</div>
+    <div class="hero-badge">⏱ 10 secondes par saisie &nbsp;·&nbsp; 📱 100% mobile &nbsp;·&nbsp; 🆓 Gratuit (Google)</div>
+  </div>
+
+  <div class="sec-wrap">
+    <div class="pb-sol">
+      <div class="pb-block prob">
+        <div class="pb-label prob">❌ Aujourd'hui</div>
+        <div class="pb-item">Réunion BizDev sans données factuelles</div>
+        <div class="pb-item">Chacun raconte — pas de grille commune</div>
+        <div class="pb-item">Impossible de voir qui fait quoi</div>
+        <div class="pb-item">Question "Utilité ?" inscrite au flip chart</div>
+        <div class="pb-item">Aucun suivi de l'évolution mois/mois</div>
+      </div>
+      <div class="arrow-mid">→</div>
+      <div class="pb-block sol">
+        <div class="pb-label sol">✅ Avec l'outil</div>
+        <div class="pb-item">Funnel CRC-R en temps réel, filtré par mois</div>
+        <div class="pb-item">Chaque action saisie en 10 sec depuis le mobile</div>
+        <div class="pb-item">Vue par consultant + total collectif</div>
+        <div class="pb-item">Utilité mesurée, pas supposée</div>
+        <div class="pb-item">Courbe d'évolution mois/mois disponible</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="sec-wrap">
+    <div class="sec-title">Le funnel CRC-R</div>
+    <div class="kpi-row">
+      <div class="kpi-card" style="background:var(--c-bg);">
+        <div class="kpi-label" style="color:var(--c-color)">C — Connus</div>
+        <div class="kpi-value" style="color:var(--c-color)">📋</div>
+        <div class="kpi-sub" style="color:var(--c-color)">Contacts ajoutés</div>
+      </div>
+      <div class="kpi-card" style="background:var(--r-bg);">
+        <div class="kpi-label" style="color:var(--r-color)">R — Reconnus</div>
+        <div class="kpi-value" style="color:var(--r-color)">🤝</div>
+        <div class="kpi-sub" style="color:var(--r-color)">Recos reçues</div>
+      </div>
+      <div class="kpi-card" style="background:var(--oe-bg);">
+        <div class="kpi-label" style="color:var(--oe-color)">C — Consultés</div>
+        <div class="kpi-value" style="color:var(--oe-color)">📄</div>
+        <div class="kpi-sub" style="color:var(--oe-color)">Offres envoyées</div>
+      </div>
+      <div class="kpi-card" style="background:var(--os-bg);">
+        <div class="kpi-label" style="color:var(--os-color)">R — Retenus</div>
+        <div class="kpi-value" style="color:var(--os-color)">🏆</div>
+        <div class="kpi-sub" style="color:var(--os-color)">Offres signées</div>
+      </div>
+    </div>
+  </div>
+
+
+</div>
+
+<!-- ══════════ SECTION 2 : DÉMO ══════════ -->
+<div class="section active" id="sec-demo">
+
+  <div class="sec-wrap">
+    <div class="sec-title">Formulaire de saisie mobile</div>
+    <p style="font-size:13px;color:var(--grey);margin-bottom:20px;">Teste en direct — saisis une action et vois-la apparaître dans le flux en temps réel.</p>
+
+    <div class="demo-layout">
+
+      <!-- PHONE -->
+      <div class="phone-wrap">
+        <div class="phone-label">📱 Ton téléphone</div>
+        <div class="phone">
+          <div class="phone-screen">
+            <div class="notch"><div class="notch-pill"><div class="notch-cam"></div><div class="notch-sensor"></div></div></div>
+            <div class="status-bar"><span>9:41</span><span>●●● WiFi 🔋</span></div>
+
+            <div class="gf-header">
+              <div class="gf-app-label">Google Forms · People Partner</div>
+              <div class="gf-title">BizDev CRC-R</div>
+              <div class="gf-sub">Saisie rapide · ~10 sec</div>
+              <div class="gf-progress"><div class="gf-progress-fill" id="progressBar"></div></div>
+            </div>
+
+            <!-- FORM STATE -->
+            <div class="gf-body" id="formBody">
+              <div class="gf-card" id="card1">
+                <div class="gf-q">Votre prénom et nom <span class="gf-req">*</span></div>
+                <input class="gf-input" id="inputName" type="text" placeholder="Ex : Marie Dupont"
+                  oninput="onNameInput()" autocomplete="off">
+                <div id="nameRememberHint" style="font-size:10px;color:#aaa;margin-top:4px;display:none;">
+                  ✓ Mémorisé — pré-rempli à ta prochaine saisie
+                </div>
+              </div>
+
+              <div class="gf-card" id="card2">
+                <div class="gf-q">Action <span class="gf-req">*</span></div>
+                <div class="action-list">
+                  <div class="action-item" onclick="selectAction(this,'Contact ajouté','#1565C0')">
+                    <div class="action-dot" style="background:#1565C0"></div> Contact ajouté
+                  </div>
+                  <div class="action-item" onclick="selectAction(this,'Recommandation reçue','#E65100')">
+                    <div class="action-dot" style="background:#E65100"></div> Recommandation reçue
+                  </div>
+                  <div class="action-item" onclick="selectAction(this,'Offre envoyée','#1976D2')">
+                    <div class="action-dot" style="background:#1976D2"></div> Offre envoyée
+                  </div>
+                  <div class="action-item" onclick="selectAction(this,'Offre signée','#2E7D32')">
+                    <div class="action-dot" style="background:#2E7D32"></div> Offre signée ✓
+                  </div>
+                </div>
+              </div>
+
+              <div class="gf-card gf-amount-wrap" id="card-amount">
+                <div class="gf-q">Montant signé <span class="gf-req">*</span> <span style="font-size:10px;color:#2E7D32">(Offre signée)</span></div>
+                <div class="gf-amount-row">
+                  <span class="gf-currency">€</span>
+                  <input class="gf-input" id="inputAmount" type="number" min="0" placeholder="Ex : 4500" oninput="onAmountInput()" style="border-bottom-color:#2E7D32;">
+                </div>
+              </div>
+
+              <div class="gf-card" id="card3">
+                <div class="gf-q">Commentaire <span style="font-size:10px;color:#aaa">(optionnel)</span></div>
+                <textarea class="gf-textarea" id="inputComment" placeholder="Contexte, client, réseau…" rows="2"></textarea>
+              </div>
+            </div>
+
+            <!-- CONFIRM STATE -->
+            <div class="gf-confirm" id="confirmScreen">
+              <div class="confirm-icon">✅</div>
+              <div class="confirm-title">Enregistré !</div>
+              <div class="confirm-detail" id="confirmDetail"></div>
+              <div class="confirm-another" onclick="resetForm()">+ Saisir une autre action</div>
+            </div>
+
+            <div class="gf-footer" id="formFooter">
+              <span class="gf-clear" onclick="resetForm()">Effacer</span>
+              <button class="gf-submit" id="submitBtn" onclick="submitForm()">Envoyer</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- RIGHT PANEL -->
+      <div class="demo-right">
+
+        <!-- LIVE FEED -->
+        <div class="feed-card">
+          <div class="feed-title">
+            <span class="live-dot"></span>
+            Activité en temps réel
+          </div>
+          <div id="liveFeed">
+            <div class="entry-empty">Aucune saisie pour l'instant.<br>Utilise le formulaire pour commencer.</div>
+          </div>
+        </div>
+
+        <!-- MINI KPI -->
+        <div class="feed-card">
+          <div class="feed-title">Compteurs de la session</div>
+          <div class="kpi-row" style="grid-template-columns:repeat(2,1fr);gap:8px;margin-bottom:0;">
+            <div class="kpi-card" style="background:var(--c-bg);padding:10px;">
+              <div class="kpi-label" style="color:var(--c-color);font-size:9px">Contacts</div>
+              <div class="kpi-value" style="color:var(--c-color);font-size:24px" id="cnt-c">0</div>
+            </div>
+            <div class="kpi-card" style="background:var(--r-bg);padding:10px;">
+              <div class="kpi-label" style="color:var(--r-color);font-size:9px">Recos</div>
+              <div class="kpi-value" style="color:var(--r-color);font-size:24px" id="cnt-r">0</div>
+            </div>
+            <div class="kpi-card" style="background:var(--oe-bg);padding:10px;">
+              <div class="kpi-label" style="color:var(--oe-color);font-size:9px">Offres env.</div>
+              <div class="kpi-value" style="color:var(--oe-color);font-size:24px" id="cnt-oe">0</div>
+            </div>
+            <div class="kpi-card" style="background:var(--os-bg);padding:10px;">
+              <div class="kpi-label" style="color:var(--os-color);font-size:9px">Signées</div>
+              <div class="kpi-value" style="color:var(--os-color);font-size:24px" id="cnt-os">0</div>
+            </div>
+            <div class="kpi-card" style="background:#E8F5E9;padding:10px;grid-column:1/-1;display:flex;align-items:center;justify-content:space-between;">
+              <div>
+                <div class="kpi-label" style="color:#1b5e20;font-size:9px">💰 CA signé (session)</div>
+                <div style="font-size:20px;font-weight:800;color:#2E7D32" id="cnt-ca">0 €</div>
+              </div>
+              <div style="font-size:28px;opacity:0.3">💶</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- HINT -->
+        <div style="background:#e8f5e9;border-radius:10px;padding:14px 16px;font-size:12px;color:#1b5e20;line-height:1.6;border-left:4px solid #43a047;">
+          <strong>💡 En vrai :</strong> chaque consultant a son propre lien raccourci sur son écran d'accueil, avec son nom pré-rempli. Saisie réduite à <strong>2 taps</strong> : choisir l'action → Envoyer.
+        </div>
+
+
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════ SECTION 3 : DASHBOARD ══════════ -->
+<div class="section" id="sec-dashboard">
+
+  <!-- Month filter -->
+  <div class="sec-wrap">
+    <div class="sec-title">Dashboard CRC-R</div>
+    <div class="month-bar" id="monthBar"></div>
+  </div>
+
+  <!-- CA Banner -->
+  <div class="ca-banner" id="caBanner">
+    <div>
+      <div class="ca-label">💰 CA signé — mois sélectionné</div>
+      <div class="ca-value" id="caValue">–</div>
+      <div class="ca-sub" id="caSub">Offres signées × montant moyen</div>
+    </div>
+    <div style="text-align:right;display:flex;flex-direction:column;align-items:flex-end;gap:8px;">
+      <div class="ca-icon">💶</div>
+      <div class="ca-trend" id="caTrend"></div>
+    </div>
+  </div>
+
+  <!-- KPI Cards -->
+  <div class="kpi-row" id="dashKpi"></div>
+
+  <!-- Funnel -->
+  <div class="funnel-row" id="funnelRow">
+    <div class="funnel-title">Entonnoir du mois sélectionné</div>
+    <div id="funnelBars"></div>
+  </div>
+
+  <!-- Courbe évolution -->
+  <div class="chart-row">
+    <div class="chart-title">Évolution mois par mois</div>
+    <div class="chart-sub">Toutes actions confondues — cumul mensuel</div>
+    <div class="chart-area">
+      <svg class="chart-svg" id="trendChart" viewBox="0 0 700 180" preserveAspectRatio="none"></svg>
+    </div>
+  </div>
+
+  <!-- Panneau Objectifs -->
+  <div class="obj-panel">
+    <div class="obj-panel-header">
+      <div class="obj-panel-title">🎯 Objectifs mensuels</div>
+      <div class="obj-panel-hint">Modifiables ici · clic sur Enregistrer pour mettre à jour le dashboard</div>
+    </div>
+    <div class="obj-ca-row">
+      <div class="obj-ca-label">🎯 Objectif CA global (mois)</div>
+      <div style="display:flex;align-items:center;gap:10px;">
+        <span style="font-size:13px;font-weight:700;color:#2E7D32;">€</span>
+        <input class="obj-input ca-input" id="obj-ca-global" type="number" min="0" step="1000">
+        <button class="obj-save-btn" onclick="saveObjectives()">Enregistrer</button>
+      </div>
+    </div>
+    <div class="obj-grid" id="objGrid"></div>
+  </div>
+
+  <!-- Consultant table -->
+  <div class="consultant-table">
+    <div class="ct-header">
+      <div class="ct-hcell" style="text-align:left">Consultant</div>
+      <div class="ct-hcell">Contacts / Obj.</div>
+      <div class="ct-hcell">Recos</div>
+      <div class="ct-hcell">Offres</div>
+      <div class="ct-hcell">Signées</div>
+      <div class="ct-hcell" style="text-align:right;padding-right:6px">CA (€)</div>
+    </div>
+    <div id="consultantRows"></div>
+    <div class="ct-total-row" id="totalRow"></div>
+  </div>
+
+</div>
+
+<!-- ══════════ SECTION 4 : SETUP ══════════ -->
+<div class="section" id="sec-setup">
+  <div class="hero" style="background:linear-gradient(135deg,#1b5e20,#2e7d32);">
+    <div class="hero-eyebrow">Mise en place</div>
+    <div class="hero-title">Opérationnel en moins d'une heure</div>
+    <div class="hero-sub">Aucun outil payant, aucune compétence technique requise. Tout repose sur Google Forms + Google Sheets, que tout le monde utilise déjà.</div>
+  </div>
+
+  <div class="sec-wrap" style="margin-top:24px;">
+    <div class="steps-row">
+      <div class="step-block">
+        <div class="step-num">1</div>
+        <div class="step-title">Créer le Form</div>
+        <div class="step-desc">Google Forms · 3 champs · Menu déroulant sur "Action"</div>
+      </div>
+      <div class="step-block">
+        <div class="step-num">2</div>
+        <div class="step-title">Connecter au Sheet</div>
+        <div class="step-desc">Réponses → Google Sheets → onglet Saisies</div>
+      </div>
+      <div class="step-block">
+        <div class="step-num">3</div>
+        <div class="step-title">Script Auto-mois</div>
+        <div class="step-desc">Apps Script · 6 lignes · Calcul du mois automatique</div>
+      </div>
+      <div class="step-block">
+        <div class="step-num">4</div>
+        <div class="step-title">Raccourcis mobiles</div>
+        <div class="step-desc">Lien personnalisé par consultant · Ajout écran d'accueil</div>
+      </div>
+      <div class="step-block">
+        <div class="step-num">5</div>
+        <div class="step-title">Go !</div>
+        <div class="step-desc">Dashboard partagé en lecture · Prêt pour la réunion</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="grid-2" style="margin-bottom:24px;">
+    <div class="card">
+      <div class="card-title">📋 Champs du formulaire</div>
+      <div class="card-sub">
+        <br>
+        <strong>① Votre prénom + nom</strong><br>Texte court · Obligatoire<br><br>
+        <strong>② Action</strong><br>Menu déroulant · 4 options : Contact ajouté / Recommandation reçue / Offre envoyée / Offre signée<br><br>
+        <strong>③ Commentaire</strong><br>Texte court · Facultatif
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-title">⚡ Script Apps Script (6 lignes)</div>
+      <div style="background:#1a1a2e;border-radius:8px;padding:14px;font-family:monospace;font-size:11px;color:#a8ff78;margin-top:10px;line-height:1.7;">
+        function onFormSubmit(e) {<br>
+        &nbsp;&nbsp;var s = SpreadsheetApp<br>
+        &nbsp;&nbsp;&nbsp;&nbsp;.getActiveSpreadsheet()<br>
+        &nbsp;&nbsp;&nbsp;&nbsp;.getSheetByName('Saisies');<br>
+        &nbsp;&nbsp;var d = new Date();<br>
+        &nbsp;&nbsp;var m = Utilities.formatDate(<br>
+        &nbsp;&nbsp;&nbsp;&nbsp;d,'Europe/Paris','yyyy-MM');<br>
+        &nbsp;&nbsp;s.getRange(s.getLastRow(),5)<br>
+        &nbsp;&nbsp;&nbsp;&nbsp;.setValue(m);<br>
+        }
+      </div>
+      <div style="font-size:11px;color:var(--grey);margin-top:8px;">Extensions → Apps Script → Déclencher sur "À l'envoi du formulaire"</div>
+    </div>
+  </div>
+
+  <div class="grid-3">
+    <div class="card" style="border-top:3px solid var(--c-color)">
+      <div class="card-title" style="color:var(--c-color)">🆓 Coût</div>
+      <div class="card-sub">100% gratuit.<br>Google Workspace ou compte Gmail suffit.</div>
+    </div>
+    <div class="card" style="border-top:3px solid var(--purple)">
+      <div class="card-title" style="color:var(--purple)">⏱ Adoption</div>
+      <div class="card-sub">10 secondes par saisie.<br>Aucune formation nécessaire.</div>
+    </div>
+    <div class="card" style="border-top:3px solid var(--green)">
+      <div class="card-title" style="color:var(--green)">📊 Reporting</div>
+      <div class="card-sub">Dashboard mis à jour en temps réel.<br>Filtrage par mois en 1 clic.</div>
+    </div>
+  </div>
+</div>
+
+<!-- TOAST -->
+<div class="toast" id="toast"></div>
+
+<script>
+// ── DATA ─────────────────────────────────────────────────────────────────
+
+const MONTHS = ['2026-04','2026-05','2026-06','2026-07','2026-08','2026-09'];
+const MONTH_LABELS = ['Avr','Mai','Juin','Juil','Août','Sep'];
+const CONSULTANTS = ['Anne','Cyril','Eric','Franck','Fred','Nadine','Tom Z.'];
+
+const ACTION_MAP = {
+  'Contact ajouté':       {key:'c',color:'#1565C0',bg:'#E3F2FD'},
+  'Recommandation reçue': {key:'r',color:'#E65100',bg:'#FFF3E0'},
+  'Offre envoyée':        {key:'oe',color:'#1976D2',bg:'#E8F4FD'},
+  'Offre signée':         {key:'os',color:'#2E7D32',bg:'#E8F5E9'},
+};
+
+// Données historiques (ca = CA signé en €)
+const HIST_DATA = {
+  '2026-04': {Anne:{c:2,r:0,oe:1,os:0,ca:0},Cyril:{c:1,r:1,oe:0,os:0,ca:0},Eric:{c:3,r:0,oe:1,os:0,ca:0},Franck:{c:1,r:0,oe:0,os:0,ca:0},Fred:{c:2,r:1,oe:1,os:0,ca:0},Nadine:{c:2,r:0,oe:1,os:1,ca:3500},'Tom Z.':{c:3,r:1,oe:1,os:0,ca:0}},
+  '2026-05': {Anne:{c:3,r:1,oe:1,os:0,ca:0},Cyril:{c:2,r:0,oe:1,os:0,ca:0},Eric:{c:2,r:1,oe:1,os:1,ca:4200},Franck:{c:3,r:1,oe:0,os:0,ca:0},Fred:{c:1,r:0,oe:1,os:0,ca:0},Nadine:{c:3,r:1,oe:2,os:1,ca:6000},'Tom Z.':{c:4,r:0,oe:2,os:1,ca:5500}},
+  '2026-06': {Anne:{c:2,r:1,oe:2,os:1,ca:4800},Cyril:{c:3,r:0,oe:1,os:0,ca:0},Eric:{c:4,r:2,oe:1,os:0,ca:0},Franck:{c:2,r:1,oe:1,os:1,ca:3200},Fred:{c:3,r:0,oe:2,os:1,ca:7500},Nadine:{c:2,r:1,oe:1,os:0,ca:0},'Tom Z.':{c:3,r:2,oe:2,os:1,ca:8000}},
+  '2026-07': {Anne:{c:4,r:2,oe:2,os:1,ca:5000},Cyril:{c:3,r:1,oe:2,os:1,ca:4500},Eric:{c:3,r:1,oe:2,os:1,ca:6000},Franck:{c:2,r:0,oe:1,os:0,ca:0},Fred:{c:4,r:2,oe:2,os:1,ca:5500},Nadine:{c:3,r:1,oe:2,os:1,ca:7000},'Tom Z.':{c:5,r:2,oe:3,os:2,ca:12000}},
+  '2026-08': {Anne:{c:3,r:2,oe:2,os:1,ca:5500},Cyril:{c:4,r:1,oe:2,os:1,ca:4800},Eric:{c:5,r:2,oe:3,os:1,ca:6500},Franck:{c:3,r:1,oe:2,os:1,ca:3800},Fred:{c:3,r:1,oe:2,os:1,ca:6000},Nadine:{c:4,r:2,oe:2,os:2,ca:9500},'Tom Z.':{c:5,r:3,oe:3,os:2,ca:14000}},
+  '2026-09': {Anne:{c:4,r:2,oe:3,os:2,ca:8500},Cyril:{c:5,r:2,oe:2,os:1,ca:5200},Eric:{c:4,r:3,oe:3,os:2,ca:9000},Franck:{c:3,r:1,oe:2,os:1,ca:4200},Fred:{c:5,r:2,oe:3,os:2,ca:8800},Nadine:{c:5,r:3,oe:3,os:2,ca:11000},'Tom Z.':{c:6,r:3,oe:4,os:3,ca:16500}},
+};
+
+// ── OBJECTIFS (modifiables via le panneau) ───────────────────────────────
+let OBJECTIVES = {
+  caGlobal: 80000,           // Objectif CA mensuel global en €
+  contacts: {                // Objectif contacts par consultant (par mois)
+    'Anne':   6,
+    'Cyril':  6,
+    'Eric':   6,
+    'Franck': 5,
+    'Fred':   6,
+    'Nadine': 6,
+    'Tom Z.': 8,
+  }
+};
+
+// Saisies démo (session live)
+let sessionEntries = [];
+let selectedMonth  = '2026-09';
+let selectedAction = null;
+
+// Compteurs session
+const counters = {c:0,r:0,oe:0,os:0,ca:0};
+
+function fmt(n) {
+  return n >= 1000
+    ? (n/1000).toFixed(n%1000===0?0:1).replace('.',',') + ' k€'
+    : n + ' €';
+}
+
+// ── NOM MÉMORISÉ ─────────────────────────────────────────────────────────
+let rememberedName = '';
+try { rememberedName = localStorage.getItem('pp_consultant_name') || ''; } catch(e) {}
+
+function initNameField() {
+  if (rememberedName) {
+    const inp = document.getElementById('inputName');
+    inp.value = rememberedName;
+    inp.classList.add('filled');
+    document.getElementById('card1').classList.add('done');
+    document.getElementById('nameRememberHint').style.display = 'block';
+    updateProgress();
+  }
+}
+
+function saveName(name) {
+  try { localStorage.setItem('pp_consultant_name', name); } catch(e) {}
+  rememberedName = name;
+  document.getElementById('nameRememberHint').style.display = name ? 'block' : 'none';
+}
+
+// ── NAVIGATION ────────────────────────────────────────────────────────────
+
+function showSection(id) {
+  document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+  document.querySelectorAll('.nav-tab').forEach(t => t.classList.remove('active'));
+  document.querySelectorAll('.btab').forEach(t => t.classList.remove('active'));
+  document.getElementById('sec-' + id).classList.add('active');
+  // Nav top (desktop)
+  const tabs = {demo:0, dashboard:1, setup:2};
+  const idx = tabs[id];
+  if (idx !== undefined) document.querySelectorAll('.nav-tab')[idx].classList.add('active');
+  // Bottom tab bar (mobile)
+  const btab = document.getElementById('btab-' + id);
+  if (btab) btab.classList.add('active');
+  if (id === 'dashboard') renderDashboard();
+  window.scrollTo(0, 0);
+}
+
+// ── FORM LOGIC ────────────────────────────────────────────────────────────
+
+function onNameInput() {
+  const v = document.getElementById('inputName').value.trim();
+  const c1 = document.getElementById('card1');
+  c1.classList.toggle('done', v.length > 0);
+  c1.classList.toggle('active', v.length === 0);
+  updateProgress();
+}
+
+function selectAction(el, action, color) {
+  document.querySelectorAll('.action-item').forEach(i => i.classList.remove('selected'));
+  el.classList.add('selected');
+  selectedAction = action;
+  document.getElementById('card2').classList.add('done');
+  document.getElementById('card2').classList.remove('active');
+  // Montant : visible uniquement pour "Offre signée"
+  const amountWrap = document.getElementById('card-amount');
+  if (action === 'Offre signée') {
+    amountWrap.classList.add('visible');
+    document.getElementById('card-amount').classList.add('active');
+  } else {
+    amountWrap.classList.remove('visible');
+    document.getElementById('inputAmount').value = '';
+  }
+  updateProgress();
+}
+
+function onAmountInput() {
+  const v = document.getElementById('inputAmount').value;
+  document.getElementById('card-amount').classList.toggle('done', v > 0);
+}
+
+function updateProgress() {
+  const name = document.getElementById('inputName').value.trim();
+  const pct = (name ? 33 : 0) + (selectedAction ? 34 : 0);
+  document.getElementById('progressBar').style.width = pct + '%';
+}
+
+function submitForm() {
+  const name = document.getElementById('inputName').value.trim();
+  if (!name) { showToast('⚠️ Saisis ton prénom'); return; }
+  if (!selectedAction) { showToast('⚠️ Choisis une action'); return; }
+
+  // Mémoriser le nom pour les prochaines saisies
+  saveName(name);
+
+  const comment = document.getElementById('inputComment').value.trim();
+  const amount  = selectedAction === 'Offre signée'
+    ? parseInt(document.getElementById('inputAmount').value) || 0
+    : 0;
+  const now = new Date();
+  const timeStr = now.getHours() + ':' + String(now.getMinutes()).padStart(2,'0');
+
+  // Add to session
+  const entry = { name, action: selectedAction, comment, amount, time: timeStr };
+  sessionEntries.unshift(entry);
+
+  // Update counters
+  const k = ACTION_MAP[selectedAction].key;
+  counters[k]++;
+  document.getElementById('cnt-' + k).textContent = counters[k];
+  if (amount > 0) {
+    counters.ca += amount;
+    document.getElementById('cnt-ca').textContent = fmt(counters.ca);
+  }
+
+  // Add to HIST_DATA for current month
+  if (!HIST_DATA['2026-09'][name]) HIST_DATA['2026-09'][name] = {c:0,r:0,oe:0,os:0,ca:0};
+  HIST_DATA['2026-09'][name][k] = (HIST_DATA['2026-09'][name][k]||0) + 1;
+  if (amount > 0) HIST_DATA['2026-09'][name].ca = (HIST_DATA['2026-09'][name].ca||0) + amount;
+
+  // Show confirm
+  document.getElementById('progressBar').style.width = '100%';
+  document.getElementById('formBody').style.display   = 'none';
+  document.getElementById('formFooter').style.display = 'none';
+  const cs = document.getElementById('confirmScreen');
+  cs.style.display = 'flex';
+  document.getElementById('confirmDetail').innerHTML =
+    `<strong>${selectedAction}</strong><br>👤 ${name}<br>`
+    + (amount > 0 ? `💰 <strong>${fmt(amount)}</strong><br>` : '')
+    + (comment ? `💬 ${comment}<br>` : '')
+    + `🗓 2026-09`;
+
+  // Update live feed
+  renderFeed();
+  showToast('✅ Ajouté au dashboard !');
+}
+
+function resetForm() {
+  selectedAction = null;
+  document.getElementById('inputComment').value = '';
+  document.getElementById('inputAmount').value  = '';
+  document.getElementById('card-amount').classList.remove('visible','done','active');
+  document.querySelectorAll('.action-item').forEach(i => i.classList.remove('selected'));
+  document.querySelectorAll('.gf-card').forEach(c => { c.classList.remove('done','active'); });
+  // Restaurer le nom mémorisé
+  const inp = document.getElementById('inputName');
+  if (rememberedName) {
+    inp.value = rememberedName;
+    inp.classList.add('filled');
+    document.getElementById('card1').classList.add('done');
+    document.getElementById('nameRememberHint').style.display = 'block';
+  } else {
+    inp.value = '';
+    inp.classList.remove('filled');
+    document.getElementById('card1').classList.add('active');
+    document.getElementById('nameRememberHint').style.display = 'none';
+  }
+  // Remettre le focus sur l'action si nom déjà connu
+  if (rememberedName) {
+    document.getElementById('card2').classList.add('active');
+  }
+  updateProgress();
+  document.getElementById('progressBar').style.width = rememberedName ? '33%' : '0%';
+  document.getElementById('formBody').style.display   = '';
+  document.getElementById('formFooter').style.display = '';
+  document.getElementById('confirmScreen').style.display = 'none';
+}
+
+function renderFeed() {
+  const feed = document.getElementById('liveFeed');
+  if (!sessionEntries.length) {
+    feed.innerHTML = '<div class="entry-empty">Aucune saisie pour l\'instant.</div>';
+    return;
+  }
+  feed.innerHTML = sessionEntries.slice(0,8).map(e => {
+    const m = ACTION_MAP[e.action];
+    return `<div class="entry-item">
+      <div class="entry-dot" style="background:${m.color}"></div>
+      <div class="entry-text">
+        <span class="entry-name">${e.name}</span> — ${e.action}
+        ${e.amount > 0 ? `<span style="color:#2E7D32;font-weight:700;margin-left:4px">+${fmt(e.amount)}</span>` : ''}
+        ${e.comment ? `<br><span style="color:#888;font-size:11px">${e.comment}</span>` : ''}
+      </div>
+      <div class="entry-time">${e.time}</div>
+    </div>`;
+  }).join('');
+}
+
+// ── DASHBOARD ─────────────────────────────────────────────────────────────
+
+function getMonthTotals(month) {
+  const data = HIST_DATA[month] || {};
+  const tot = {c:0,r:0,oe:0,os:0,ca:0};
+  Object.values(data).forEach(d => {
+    tot.c  += d.c  || 0;
+    tot.r  += d.r  || 0;
+    tot.oe += d.oe || 0;
+    tot.os += d.os || 0;
+    tot.ca += d.ca || 0;
+  });
+  return tot;
+}
+
+function renderDashboard() {
+  renderMonthBar();
+  renderCaBanner();
+  renderKpi();
+  renderFunnel();
+  renderTrend();
+  renderObjectives();
+  renderConsultants();
+}
+
+function renderObjectives() {
+  // Pré-remplir champ CA global
+  document.getElementById('obj-ca-global').value = OBJECTIVES.caGlobal;
+
+  // Générer la grille par consultant
+  const grid = document.getElementById('objGrid');
+  grid.innerHTML = CONSULTANTS.map(name => {
+    const objC = OBJECTIVES.contacts[name] || 5;
+    return `<div class="obj-row">
+      <div class="obj-name">${name}</div>
+      <div class="obj-input-row">
+        <span class="obj-input-label">📋 Contacts / mois</span>
+        <input class="obj-input" type="number" min="1" max="30"
+          id="obj-c-${name.replace(/\s/g,'_').replace(/\./g,'')}"
+          value="${objC}" onchange="renderDashboard()">
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function saveObjectives() {
+  OBJECTIVES.caGlobal = parseInt(document.getElementById('obj-ca-global').value) || 0;
+  CONSULTANTS.forEach(name => {
+    const id = 'obj-c-' + name.replace(/\s/g,'_').replace(/\./g,'');
+    const el = document.getElementById(id);
+    if (el) OBJECTIVES.contacts[name] = parseInt(el.value) || 5;
+  });
+  renderDashboard();
+  showToast('✅ Objectifs mis à jour !');
+}
+
+function renderCaBanner() {
+  const t    = getMonthTotals(selectedMonth);
+  const idx  = MONTHS.indexOf(selectedMonth);
+  const prev = idx > 0 ? getMonthTotals(MONTHS[idx-1]) : null;
+  const obj  = OBJECTIVES.caGlobal;
+  const pct  = obj > 0 ? Math.min(Math.round(t.ca / obj * 100), 100) : 0;
+  const over = obj > 0 && t.ca >= obj;
+
+  document.getElementById('caValue').textContent = fmt(t.ca);
+  document.getElementById('caSub').textContent =
+    t.os > 0
+      ? `${t.os} offre${t.os>1?'s':''} signée${t.os>1?'s':''} · moy. ${fmt(Math.round(t.ca/t.os))}`
+      : 'Aucune offre signée ce mois';
+
+  // Barre progression vs objectif
+  let progressHtml = '';
+  if (obj > 0) {
+    progressHtml = `
+      <div class="ca-progress-wrap">
+        <div class="ca-progress-label">
+          <span>Objectif : ${fmt(obj)}</span>
+          <span style="font-weight:700;color:${over?'#a5d6a7':'rgba(255,255,255,0.9)'}">${pct}% atteint${over?' ✓':''}</span>
+        </div>
+        <div class="ca-progress-bg">
+          <div class="ca-progress-fill" style="width:${pct}%;background:${over?'#69f0ae':'rgba(255,255,255,0.75)'}"></div>
+        </div>
+      </div>`;
+  }
+  // Injecter après caSub
+  const subEl = document.getElementById('caSub');
+  const existProg = document.getElementById('caProgressInline');
+  if (existProg) existProg.remove();
+  const progDiv = document.createElement('div');
+  progDiv.id = 'caProgressInline';
+  progDiv.innerHTML = progressHtml;
+  subEl.after(progDiv);
+
+  let trendHtml = '';
+  if (prev && prev.ca > 0) {
+    const diff = t.ca - prev.ca;
+    const p    = Math.round(diff / prev.ca * 100);
+    const up   = diff >= 0;
+    trendHtml = `${up ? '▲' : '▼'} ${up?'+':''}${p}% vs mois préc.`;
+    document.getElementById('caTrend').style.background = up ? 'rgba(255,255,255,0.2)' : 'rgba(239,83,80,0.3)';
+  } else {
+    trendHtml = '— premier mois';
+    document.getElementById('caTrend').style.background = 'rgba(255,255,255,0.15)';
+  }
+  document.getElementById('caTrend').textContent = trendHtml;
+}
+
+function renderMonthBar() {
+  const bar = document.getElementById('monthBar');
+  bar.innerHTML = MONTHS.map((m,i) =>
+    `<button class="month-btn ${m===selectedMonth?'active':''}" onclick="selectMonth('${m}')">${MONTH_LABELS[i]}</button>`
+  ).join('');
+}
+
+function selectMonth(m) {
+  selectedMonth = m;
+  renderDashboard();
+}
+
+function renderKpi() {
+  const t = getMonthTotals(selectedMonth);
+  const configs = [
+    {key:'c',label:'C — Connus',sub:'Contacts ajoutés',color:'var(--c-color)',bg:'var(--c-bg)',val:t.c},
+    {key:'r',label:'R — Reconnus',sub:'Recos reçues',color:'var(--r-color)',bg:'var(--r-bg)',val:t.r},
+    {key:'oe',label:'C — Consultés',sub:'Offres envoyées',color:'var(--oe-color)',bg:'var(--oe-bg)',val:t.oe},
+    {key:'os',label:'R — Retenus',sub:'Offres signées',color:'var(--os-color)',bg:'var(--os-bg)',val:t.os},
+  ];
+  document.getElementById('dashKpi').innerHTML = configs.map(cfg =>
+    `<div class="kpi-card" style="background:${cfg.bg}">
+      <div class="kpi-label" style="color:${cfg.color}">${cfg.label}</div>
+      <div class="kpi-value" style="color:${cfg.color}">${cfg.val}</div>
+      <div class="kpi-sub" style="color:${cfg.color}">${cfg.sub}</div>
+    </div>`
+  ).join('');
+}
+
+function renderFunnel() {
+  const t = getMonthTotals(selectedMonth);
+  const max = Math.max(t.c, 1);
+  const steps = [
+    {label:'Connus',val:t.c,color:'#1565C0'},
+    {label:'Reconnus',val:t.r,color:'#E65100'},
+    {label:'Consultés',val:t.oe,color:'#1976D2'},
+    {label:'Retenus',val:t.os,color:'#2E7D32'},
+  ];
+  document.getElementById('funnelBars').innerHTML = steps.map(s =>
+    `<div class="funnel-step">
+      <div class="funnel-step-header">
+        <span class="funnel-step-name" style="color:${s.color}">${s.label}</span>
+        <span class="funnel-step-val">${s.val} action${s.val!==1?'s':''}</span>
+      </div>
+      <div class="funnel-bar-bg">
+        <div class="funnel-bar-fill" style="width:${Math.round(s.val/max*100)}%;background:${s.color}"></div>
+      </div>
+    </div>`
+  ).join('');
+}
+
+function renderTrend() {
+  const svg = document.getElementById('trendChart');
+  const W = 700, H = 180, PL = 40, PR = 20, PT = 20, PB = 36;
+  const CW = W - PL - PR, CH = H - PT - PB;
+
+  // Data: sum all actions per month
+  const series = {
+    c:  MONTHS.map(m => getMonthTotals(m).c),
+    r:  MONTHS.map(m => getMonthTotals(m).r),
+    oe: MONTHS.map(m => getMonthTotals(m).oe),
+    os: MONTHS.map(m => getMonthTotals(m).os),
+  };
+  const colors = {c:'#1565C0',r:'#E65100',oe:'#1976D2',os:'#2E7D32'};
+  const labels = {c:'Contacts',r:'Recos',oe:'Offres env.',os:'Signées'};
+  const allVals = Object.values(series).flat();
+  const maxV = Math.max(...allVals, 1);
+  const N = MONTHS.length;
+
+  function px(i) { return PL + i * (CW / (N-1)); }
+  function py(v) { return PT + CH - (v / maxV) * CH; }
+
+  let out = '';
+
+  // Grid lines
+  for (let g = 0; g <= 4; g++) {
+    const y = PT + (g/4)*CH;
+    const val = Math.round(maxV * (1 - g/4));
+    out += `<line x1="${PL}" y1="${y}" x2="${W-PR}" y2="${y}" stroke="#f0f0f0" stroke-width="1"/>`;
+    out += `<text x="${PL-4}" y="${y+3}" text-anchor="end" font-size="9" fill="#aaa">${val}</text>`;
+  }
+
+  // Month labels
+  MONTH_LABELS.forEach((l,i) => {
+    const active = MONTHS[i] === selectedMonth;
+    out += `<text x="${px(i)}" y="${H-6}" text-anchor="middle" font-size="10"
+      font-weight="${active?'700':'400'}" fill="${active?'#1F2D3D':'#aaa'}">${l}</text>`;
+    if (active) {
+      out += `<line x1="${px(i)}" y1="${PT}" x2="${px(i)}" y2="${PT+CH}"
+        stroke="#1F2D3D" stroke-width="1" stroke-dasharray="3,3" opacity="0.3"/>`;
+    }
+  });
+
+  // Lines + dots
+  Object.entries(series).forEach(([key, vals]) => {
+    const col = colors[key];
+    const pts = vals.map((_,i) => `${px(i)},${py(vals[i])}`).join(' ');
+    out += `<polyline points="${pts}" fill="none" stroke="${col}" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round" opacity="0.85"/>`;
+    vals.forEach((v,i) => {
+      const active = MONTHS[i] === selectedMonth;
+      out += `<circle cx="${px(i)}" cy="${py(v)}" r="${active?5:3.5}"
+        fill="${active?col:'#fff'}" stroke="${col}" stroke-width="2"/>`;
+      if (active) {
+        out += `<text x="${px(i)}" y="${py(v)-10}" text-anchor="middle" font-size="10"
+          font-weight="700" fill="${col}">${v}</text>`;
+      }
+    });
+  });
+
+  // Courbe CA (axe droit, échelle indépendante)
+  const caVals = MONTHS.map(m => getMonthTotals(m).ca);
+  const maxCA  = Math.max(...caVals, 1);
+  const pyCA   = v => PT + CH - (v / maxCA) * CH;
+  const caColor = '#1b5e20';
+  const caPts = caVals.map((_,i) => `${px(i)},${pyCA(caVals[i])}`).join(' ');
+  out += `<polyline points="${caPts}" fill="none" stroke="${caColor}" stroke-width="2.5"
+    stroke-dasharray="6,3" stroke-linejoin="round" stroke-linecap="round" opacity="0.9"/>`;
+  caVals.forEach((v,i) => {
+    const active = MONTHS[i] === selectedMonth;
+    out += `<circle cx="${px(i)}" cy="${pyCA(v)}" r="${active?5:3}"
+      fill="${active?caColor:'#fff'}" stroke="${caColor}" stroke-width="2"/>`;
+    if (active && v > 0) {
+      out += `<text x="${px(i)}" y="${pyCA(v)-10}" text-anchor="middle" font-size="10"
+        font-weight="700" fill="${caColor}">${fmt(v)}</text>`;
+    }
+  });
+  // Axe CA à droite
+  out += `<text x="${W-PR+4}" y="${PT+4}" font-size="8" fill="${caColor}" text-anchor="start">${fmt(maxCA)}</text>`;
+  out += `<text x="${W-PR+4}" y="${PT+CH/2}" font-size="8" fill="${caColor}" text-anchor="start">${fmt(Math.round(maxCA/2))}</text>`;
+
+  // Legend
+  let lx = PL;
+  Object.entries(labels).forEach(([key,lbl]) => {
+    out += `<rect x="${lx}" y="${H-18}" width="10" height="10" rx="2" fill="${colors[key]}"/>`;
+    out += `<text x="${lx+14}" y="${H-10}" font-size="10" fill="#555">${lbl}</text>`;
+    lx += 110;
+  });
+  out += `<line x1="${lx}" y1="${H-14}" x2="${lx+10}" y2="${H-14}" stroke="${caColor}" stroke-width="2.5" stroke-dasharray="4,2"/>`;
+  out += `<text x="${lx+14}" y="${H-10}" font-size="10" fill="${caColor}">CA signé</text>`;
+
+  svg.innerHTML = out;
+}
+
+function renderConsultants() {
+  const data = HIST_DATA[selectedMonth] || {};
+  const rows = document.getElementById('consultantRows');
+  let tc=0,tr=0,toe=0,tos=0,tca=0,totalObjC=0;
+
+  const allNames = new Set([...CONSULTANTS, ...Object.keys(data)]);
+  rows.innerHTML = [...allNames].map((name,i) => {
+    const d    = data[name] || {c:0,r:0,oe:0,os:0,ca:0};
+    const objC = OBJECTIVES.contacts[name] || 5;
+    tc+=d.c; tr+=d.r; toe+=d.oe; tos+=d.os; tca+=(d.ca||0); totalObjC+=objC;
+    const bg   = i%2===0 ? '#fff' : '#fafafa';
+    const cv   = (v,col,bg2) => v>0
+      ? `<div class="ct-cell" style="color:${col};background:${bg2}">${v}</div>`
+      : `<div class="ct-cell" style="color:#ccc">0</div>`;
+    const caV  = d.ca || 0;
+    const cPct = Math.min(Math.round((d.c||0) / objC * 100), 100);
+    const cOk  = (d.c||0) >= objC;
+    const barColor = cOk ? '#43a047' : cPct >= 60 ? '#fb8c00' : '#e53935';
+    const contactCell = `
+      <div class="contact-cell">
+        <span class="contact-val" style="color:${barColor}">${d.c||0}</span>
+        <div class="contact-mini-bar">
+          <div class="contact-mini-fill" style="width:${cPct}%;background:${barColor}"></div>
+        </div>
+        <span class="contact-obj">/ ${objC} obj.</span>
+      </div>`;
+    return `<div class="ct-row" style="background:${bg}">
+      <div class="ct-name">${name}</div>
+      ${contactCell}
+      ${cv(d.r,'#E65100','#FFF3E0')}
+      ${cv(d.oe,'#1976D2','#E8F4FD')}
+      ${cv(d.os,'#2E7D32','#E8F5E9')}
+      <div class="ct-ca-cell">${caV > 0 ? fmt(caV) : '<span style="color:#ccc">—</span>'}</div>
+    </div>`;
+  }).join('');
+
+  document.getElementById('totalRow').innerHTML =
+    `<div class="ct-total-label">TOTAL</div>
+     <div class="ct-total-cell" style="font-size:12px">${tc} <span style="font-size:9px;opacity:0.7">/ ${totalObjC}</span></div>
+     <div class="ct-total-cell">${tr}</div>
+     <div class="ct-total-cell">${toe}</div>
+     <div class="ct-total-cell">${tos}</div>
+     <div class="ct-total-cell" style="text-align:right;padding-right:6px">${fmt(tca)}</div>`;
+}
+
+// ── TOAST ─────────────────────────────────────────────────────────────────
+
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 2500);
+}
+
+// ── INIT ──────────────────────────────────────────────────────────────────
+initNameField();
+renderDashboard();
+</script>
+</body>
+</html>
