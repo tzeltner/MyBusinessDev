@@ -935,7 +935,12 @@ const MONTHS = [];
 })();
 const MONTH_LABELS = MONTHS.map(k => MONTH_NAMES[+k.slice(5,7)-1] + (k.slice(0,4) !== FIRST_MONTH.slice(0,4) ? ' ' + k.slice(2,4) : ''));
 function esc(v) { return String(v == null ? '' : v).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
-const CONSULTANTS = ['Anne','Cyril','Eric','Franck','Fred','Nadine','Tom Z.'];
+// Aucun consultant pré-enregistré : chacun apparaît dès sa première saisie.
+function consultants() {
+  const names = new Set();
+  Object.values(HIST_DATA).forEach(month => Object.keys(month).forEach(n => names.add(n)));
+  return [...names].sort((a,b) => a.localeCompare(b, 'fr'));
+}
 
 const ACTION_MAP = {
   'Contact ajouté':       {key:'c',color:'#1565C0',bg:'#E3F2FD'},
@@ -991,15 +996,7 @@ async function postData(payload) {
 // ── OBJECTIFS (modifiables via le panneau) ───────────────────────────────
 let OBJECTIVES = {
   caGlobal: 80000,           // Objectif CA mensuel global en €
-  contacts: {                // Objectif contacts par consultant (par mois)
-    'Anne':   6,
-    'Cyril':  6,
-    'Eric':   6,
-    'Franck': 5,
-    'Fred':   6,
-    'Nadine': 6,
-    'Tom Z.': 8,
-  }
+  contacts: {}               // Objectif contacts par consultant (par mois), 5 par défaut
 };
 
 // Saisies démo (session live)
@@ -1227,25 +1224,24 @@ function renderObjectives() {
 
   // Générer la grille par consultant
   const grid = document.getElementById('objGrid');
-  grid.innerHTML = CONSULTANTS.map(name => {
+  const names = consultants();
+  grid.innerHTML = names.length ? names.map((name,i) => {
     const objC = OBJECTIVES.contacts[name] || 5;
     return `<div class="obj-row">
-      <div class="obj-name">${name}</div>
+      <div class="obj-name">${esc(name)}</div>
       <div class="obj-input-row">
         <span class="obj-input-label">📋 Contacts / mois</span>
         <input class="obj-input" type="number" min="1" max="30"
-          id="obj-c-${name.replace(/\s/g,'_').replace(/\./g,'')}"
-          value="${objC}">
+          id="obj-c-${i}" value="${objC}">
       </div>
     </div>`;
-  }).join('');
+  }).join('') : '<div class="entry-empty" style="padding:16px">Les consultants apparaîtront ici dès leur première saisie.</div>';
 }
 
 function saveObjectives() {
   OBJECTIVES.caGlobal = parseInt(document.getElementById('obj-ca-global').value) || 0;
-  CONSULTANTS.forEach(name => {
-    const id = 'obj-c-' + name.replace(/\s/g,'_').replace(/\./g,'');
-    const el = document.getElementById(id);
+  consultants().forEach((name,i) => {
+    const el = document.getElementById('obj-c-' + i);
     if (el) OBJECTIVES.contacts[name] = parseInt(el.value) || 5;
   });
   renderDashboard();
@@ -1453,8 +1449,10 @@ function renderConsultants() {
   const rows = document.getElementById('consultantRows');
   let tc=0,tr=0,toe=0,tos=0,tca=0,totalObjC=0;
 
-  const allNames = new Set([...CONSULTANTS, ...Object.keys(data)]);
-  rows.innerHTML = [...allNames].map((name,i) => {
+  const allNames = consultants();
+  rows.innerHTML = !allNames.length
+    ? '<div class="entry-empty" style="padding:16px">Aucun consultant pour l\'instant — chacun apparaît dès sa première saisie.</div>'
+    : allNames.map((name,i) => {
     const d    = data[name] || {c:0,r:0,oe:0,os:0,ca:0};
     const objC = OBJECTIVES.contacts[name] || 5;
     tc+=d.c; tr+=d.r; toe+=d.oe; tos+=d.os; tca+=(d.ca||0); totalObjC+=objC;
