@@ -619,7 +619,6 @@ body {
   <div class="nav-tabs">
     <button class="nav-tab active" onclick="showSection('demo')">📱 Formulaire</button>
     <button class="nav-tab" onclick="showSection('dashboard')">📊 Dashboard</button>
-    <button class="nav-tab" onclick="showSection('setup')">⚙️ Mise en place</button>
   </div>
 </nav>
 
@@ -633,10 +632,6 @@ body {
     <button class="btab" id="btab-dashboard" onclick="showSection('dashboard')">
       <div class="btab-icon">📊</div>
       <div class="btab-label">Dashboard</div>
-    </button>
-    <button class="btab" id="btab-setup" onclick="showSection('setup')">
-      <div class="btab-icon">⚙️</div>
-      <div class="btab-label">Setup</div>
     </button>
   </div>
 </div>
@@ -912,88 +907,6 @@ body {
 
 </div>
 
-<!-- ══════════ SECTION 4 : SETUP ══════════ -->
-<div class="section" id="sec-setup">
-  <div class="hero" style="background:linear-gradient(135deg,#1b5e20,#2e7d32);">
-    <div class="hero-eyebrow">Mise en place</div>
-    <div class="hero-title">Opérationnel en moins d'une heure</div>
-    <div class="hero-sub">Aucun outil payant, aucune compétence technique requise. Tout repose sur Google Forms + Google Sheets, que tout le monde utilise déjà.</div>
-  </div>
-
-  <div class="sec-wrap" style="margin-top:24px;">
-    <div class="steps-row">
-      <div class="step-block">
-        <div class="step-num">1</div>
-        <div class="step-title">Créer le Form</div>
-        <div class="step-desc">Google Forms · 3 champs · Menu déroulant sur "Action"</div>
-      </div>
-      <div class="step-block">
-        <div class="step-num">2</div>
-        <div class="step-title">Connecter au Sheet</div>
-        <div class="step-desc">Réponses → Google Sheets → onglet Saisies</div>
-      </div>
-      <div class="step-block">
-        <div class="step-num">3</div>
-        <div class="step-title">Script Auto-mois</div>
-        <div class="step-desc">Apps Script · 6 lignes · Calcul du mois automatique</div>
-      </div>
-      <div class="step-block">
-        <div class="step-num">4</div>
-        <div class="step-title">Raccourcis mobiles</div>
-        <div class="step-desc">Lien personnalisé par consultant · Ajout écran d'accueil</div>
-      </div>
-      <div class="step-block">
-        <div class="step-num">5</div>
-        <div class="step-title">Go !</div>
-        <div class="step-desc">Dashboard partagé en lecture · Prêt pour la réunion</div>
-      </div>
-    </div>
-  </div>
-
-  <div class="grid-2" style="margin-bottom:24px;">
-    <div class="card">
-      <div class="card-title">📋 Champs du formulaire</div>
-      <div class="card-sub">
-        <br>
-        <strong>① Votre prénom + nom</strong><br>Texte court · Obligatoire<br><br>
-        <strong>② Action</strong><br>Menu déroulant · 4 options : Contact ajouté / Recommandation reçue / Offre envoyée / Offre signée<br><br>
-        <strong>③ Commentaire</strong><br>Texte court · Facultatif
-      </div>
-    </div>
-    <div class="card">
-      <div class="card-title">⚡ Script Apps Script (6 lignes)</div>
-      <div style="background:#1a1a2e;border-radius:8px;padding:14px;font-family:monospace;font-size:11px;color:#a8ff78;margin-top:10px;line-height:1.7;">
-        function onFormSubmit(e) {<br>
-        &nbsp;&nbsp;var s = SpreadsheetApp<br>
-        &nbsp;&nbsp;&nbsp;&nbsp;.getActiveSpreadsheet()<br>
-        &nbsp;&nbsp;&nbsp;&nbsp;.getSheetByName('Saisies');<br>
-        &nbsp;&nbsp;var d = new Date();<br>
-        &nbsp;&nbsp;var m = Utilities.formatDate(<br>
-        &nbsp;&nbsp;&nbsp;&nbsp;d,'Europe/Paris','yyyy-MM');<br>
-        &nbsp;&nbsp;s.getRange(s.getLastRow(),5)<br>
-        &nbsp;&nbsp;&nbsp;&nbsp;.setValue(m);<br>
-        }
-      </div>
-      <div style="font-size:11px;color:var(--grey);margin-top:8px;">Extensions → Apps Script → Déclencher sur "À l'envoi du formulaire"</div>
-    </div>
-  </div>
-
-  <div class="grid-3">
-    <div class="card" style="border-top:3px solid var(--c-color)">
-      <div class="card-title" style="color:var(--c-color)">🆓 Coût</div>
-      <div class="card-sub">100% gratuit.<br>Google Workspace ou compte Gmail suffit.</div>
-    </div>
-    <div class="card" style="border-top:3px solid var(--purple)">
-      <div class="card-title" style="color:var(--purple)">⏱ Adoption</div>
-      <div class="card-sub">10 secondes par saisie.<br>Aucune formation nécessaire.</div>
-    </div>
-    <div class="card" style="border-top:3px solid var(--green)">
-      <div class="card-title" style="color:var(--green)">📊 Reporting</div>
-      <div class="card-sub">Dashboard mis à jour en temps réel.<br>Filtrage par mois en 1 clic.</div>
-    </div>
-  </div>
-</div>
-
 <!-- TOAST -->
 <div class="toast" id="toast"></div>
 
@@ -1013,12 +926,12 @@ const ACTION_MAP = {
 
 // Données historiques (ca = CA signé en €)
 const HIST_DATA = {
-  '2026-04': {Anne:{c:2,r:0,oe:1,os:0,ca:0},Cyril:{c:1,r:1,oe:0,os:0,ca:0},Eric:{c:3,r:0,oe:1,os:0,ca:0},Franck:{c:1,r:0,oe:0,os:0,ca:0},Fred:{c:2,r:1,oe:1,os:0,ca:0},Nadine:{c:2,r:0,oe:1,os:1,ca:3500},'Tom Z.':{c:3,r:1,oe:1,os:0,ca:0}},
-  '2026-05': {Anne:{c:3,r:1,oe:1,os:0,ca:0},Cyril:{c:2,r:0,oe:1,os:0,ca:0},Eric:{c:2,r:1,oe:1,os:1,ca:4200},Franck:{c:3,r:1,oe:0,os:0,ca:0},Fred:{c:1,r:0,oe:1,os:0,ca:0},Nadine:{c:3,r:1,oe:2,os:1,ca:6000},'Tom Z.':{c:4,r:0,oe:2,os:1,ca:5500}},
-  '2026-06': {Anne:{c:2,r:1,oe:2,os:1,ca:4800},Cyril:{c:3,r:0,oe:1,os:0,ca:0},Eric:{c:4,r:2,oe:1,os:0,ca:0},Franck:{c:2,r:1,oe:1,os:1,ca:3200},Fred:{c:3,r:0,oe:2,os:1,ca:7500},Nadine:{c:2,r:1,oe:1,os:0,ca:0},'Tom Z.':{c:3,r:2,oe:2,os:1,ca:8000}},
-  '2026-07': {Anne:{c:4,r:2,oe:2,os:1,ca:5000},Cyril:{c:3,r:1,oe:2,os:1,ca:4500},Eric:{c:3,r:1,oe:2,os:1,ca:6000},Franck:{c:2,r:0,oe:1,os:0,ca:0},Fred:{c:4,r:2,oe:2,os:1,ca:5500},Nadine:{c:3,r:1,oe:2,os:1,ca:7000},'Tom Z.':{c:5,r:2,oe:3,os:2,ca:12000}},
-  '2026-08': {Anne:{c:3,r:2,oe:2,os:1,ca:5500},Cyril:{c:4,r:1,oe:2,os:1,ca:4800},Eric:{c:5,r:2,oe:3,os:1,ca:6500},Franck:{c:3,r:1,oe:2,os:1,ca:3800},Fred:{c:3,r:1,oe:2,os:1,ca:6000},Nadine:{c:4,r:2,oe:2,os:2,ca:9500},'Tom Z.':{c:5,r:3,oe:3,os:2,ca:14000}},
-  '2026-09': {Anne:{c:4,r:2,oe:3,os:2,ca:8500},Cyril:{c:5,r:2,oe:2,os:1,ca:5200},Eric:{c:4,r:3,oe:3,os:2,ca:9000},Franck:{c:3,r:1,oe:2,os:1,ca:4200},Fred:{c:5,r:2,oe:3,os:2,ca:8800},Nadine:{c:5,r:3,oe:3,os:2,ca:11000},'Tom Z.':{c:6,r:3,oe:4,os:3,ca:16500}},
+  '2026-04': {},
+  '2026-05': {},
+  '2026-06': {},
+  '2026-07': {},
+  '2026-08': {},
+  '2026-09': {},
 };
 
 // ── OBJECTIFS (modifiables via le panneau) ───────────────────────────────
@@ -1078,7 +991,7 @@ function showSection(id) {
   document.querySelectorAll('.btab').forEach(t => t.classList.remove('active'));
   document.getElementById('sec-' + id).classList.add('active');
   // Nav top (desktop)
-  const tabs = {demo:0, dashboard:1, setup:2};
+  const tabs = {demo:0, dashboard:1};
   const idx = tabs[id];
   if (idx !== undefined) document.querySelectorAll('.nav-tab')[idx].classList.add('active');
   // Bottom tab bar (mobile)
