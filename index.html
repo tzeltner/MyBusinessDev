@@ -913,8 +913,28 @@ body {
 <script>
 // ── DATA ─────────────────────────────────────────────────────────────────
 
-const MONTHS = ['2026-04','2026-05','2026-06','2026-07','2026-08','2026-09'];
-const MONTH_LABELS = ['Avr','Mai','Juin','Juil','Août','Sep'];
+// ── STOCKAGE PARTAGÉ ─────────────────────────────────────────────────────
+// URL de l'application web Google Apps Script (se termine par /exec).
+// Vide = mode local : les saisies ne sont pas enregistrées.
+const API_URL = '';
+
+// ── MOIS : d'octobre 2026 (premier mois) jusqu'au mois en cours ──────────
+const FIRST_MONTH = '2026-10';
+const MONTH_NAMES = ['Jan','Fév','Mars','Avr','Mai','Juin','Juil','Août','Sep','Oct','Nov','Déc'];
+function monthKey(d) { return d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0'); }
+const CURRENT_MONTH = monthKey(new Date()) > FIRST_MONTH ? monthKey(new Date()) : FIRST_MONTH;
+const MONTHS = [];
+(function () {
+  let y = +FIRST_MONTH.slice(0,4), m = +FIRST_MONTH.slice(5,7);
+  for (;;) {
+    const k = y + '-' + String(m).padStart(2,'0');
+    MONTHS.push(k);
+    if (k >= CURRENT_MONTH) break;
+    if (++m > 12) { m = 1; y++; }
+  }
+})();
+const MONTH_LABELS = MONTHS.map(k => MONTH_NAMES[+k.slice(5,7)-1] + (k.slice(0,4) !== FIRST_MONTH.slice(0,4) ? ' ' + k.slice(2,4) : ''));
+function esc(v) { return String(v == null ? '' : v).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
 const CONSULTANTS = ['Anne','Cyril','Eric','Franck','Fred','Nadine','Tom Z.'];
 
 const ACTION_MAP = {
@@ -925,14 +945,48 @@ const ACTION_MAP = {
 };
 
 // Données historiques (ca = CA signé en €)
-const HIST_DATA = {
-  '2026-04': {},
-  '2026-05': {},
-  '2026-06': {},
-  '2026-07': {},
-  '2026-08': {},
-  '2026-09': {},
-};
+let HIST_DATA = {};
+MONTHS.forEach(m => { HIST_DATA[m] = {}; });
+
+function addToHist(month, name, key, amount) {
+  if (!HIST_DATA[month]) return;
+  if (!HIST_DATA[month][name]) HIST_DATA[month][name] = {c:0,r:0,oe:0,os:0,ca:0};
+  HIST_DATA[month][name][key] += 1;
+  HIST_DATA[month][name].ca += amount || 0;
+}
+
+// Recharge toutes les saisies (et les objectifs) depuis le stockage partagé
+async function loadData() {
+  if (!API_URL) return;
+  try {
+    const res = await fetch(API_URL);
+    const data = await res.json();
+    if (!data.ok) throw new Error(data.error || 'réponse invalide');
+    const fresh = {};
+    MONTHS.forEach(m => { fresh[m] = {}; });
+    HIST_DATA = fresh;
+    (data.entries || []).forEach(e => {
+      const a = ACTION_MAP[e.action];
+      if (a) addToHist(e.month, String(e.name), a.key, Number(e.amount) || 0);
+    });
+    if (data.objectives && data.objectives.contacts) {
+      OBJECTIVES.caGlobal = Number(data.objectives.caGlobal) || 0;
+      Object.assign(OBJECTIVES.contacts, data.objectives.contacts);
+    }
+    renderDashboard();
+  } catch (err) {
+    showToast('⚠️ Données partagées indisponibles');
+  }
+}
+
+// Envoie une saisie ou les objectifs (text/plain : pas de pré-vérification CORS)
+async function postData(payload) {
+  if (!API_URL) return false;
+  const res = await fetch(API_URL, { method:'POST', body: JSON.stringify(payload) });
+  const data = await res.json();
+  if (!data.ok) throw new Error(data.error || 'refusé');
+  return true;
+}
 
 // ── OBJECTIFS (modifiables via le panneau) ───────────────────────────────
 let OBJECTIVES = {
@@ -950,7 +1004,7 @@ let OBJECTIVES = {
 
 // Saisies démo (session live)
 let sessionEntries = [];
-let selectedMonth  = '2026-09';
+let selectedMonth  = CURRENT_MONTH;
 let selectedAction = null;
 
 // Compteurs session
@@ -997,7 +1051,7 @@ function showSection(id) {
   // Bottom tab bar (mobile)
   const btab = document.getElementById('btab-' + id);
   if (btab) btab.classList.add('active');
-  if (id === 'dashboard') renderDashboard();
+  if (id === 'dashboard') { renderDashboard(); loadData(); }
   window.scrollTo(0, 0);
 }
 
@@ -1068,10 +1122,11 @@ function submitForm() {
     document.getElementById('cnt-ca').textContent = fmt(counters.ca);
   }
 
-  // Add to HIST_DATA for current month
-  if (!HIST_DATA['2026-09'][name]) HIST_DATA['2026-09'][name] = {c:0,r:0,oe:0,os:0,ca:0};
-  HIST_DATA['2026-09'][name][k] = (HIST_DATA['2026-09'][name][k]||0) + 1;
-  if (amount > 0) HIST_DATA['2026-09'][name].ca = (HIST_DATA['2026-09'][name].ca||0) + amount;
+  // Ajout au mois en cours + envoi au stockage partagé
+  addToHist(CURRENT_MONTH, name, k, amount);
+  postData({ type:'entry', name, action: selectedAction, amount, comment })
+    .then(saved => { if (saved) loadData(); })
+    .catch(() => showToast('⚠️ Saisie non enregistrée — réessaie'));
 
   // Show confirm
   document.getElementById('progressBar').style.width = '100%';
@@ -1080,10 +1135,10 @@ function submitForm() {
   const cs = document.getElementById('confirmScreen');
   cs.style.display = 'flex';
   document.getElementById('confirmDetail').innerHTML =
-    `<strong>${selectedAction}</strong><br>👤 ${name}<br>`
+    `<strong>${selectedAction}</strong><br>👤 ${esc(name)}<br>`
     + (amount > 0 ? `💰 <strong>${fmt(amount)}</strong><br>` : '')
-    + (comment ? `💬 ${comment}<br>` : '')
-    + `🗓 2026-09`;
+    + (comment ? `💬 ${esc(comment)}<br>` : '')
+    + `🗓 ${CURRENT_MONTH}`;
 
   // Update live feed
   renderFeed();
@@ -1132,9 +1187,9 @@ function renderFeed() {
     return `<div class="entry-item">
       <div class="entry-dot" style="background:${m.color}"></div>
       <div class="entry-text">
-        <span class="entry-name">${e.name}</span> — ${e.action}
+        <span class="entry-name">${esc(e.name)}</span> — ${e.action}
         ${e.amount > 0 ? `<span style="color:#2E7D32;font-weight:700;margin-left:4px">+${fmt(e.amount)}</span>` : ''}
-        ${e.comment ? `<br><span style="color:#888;font-size:11px">${e.comment}</span>` : ''}
+        ${e.comment ? `<br><span style="color:#888;font-size:11px">${esc(e.comment)}</span>` : ''}
       </div>
       <div class="entry-time">${e.time}</div>
     </div>`;
@@ -1180,7 +1235,7 @@ function renderObjectives() {
         <span class="obj-input-label">📋 Contacts / mois</span>
         <input class="obj-input" type="number" min="1" max="30"
           id="obj-c-${name.replace(/\s/g,'_').replace(/\./g,'')}"
-          value="${objC}" onchange="renderDashboard()">
+          value="${objC}">
       </div>
     </div>`;
   }).join('');
@@ -1195,6 +1250,8 @@ function saveObjectives() {
   });
   renderDashboard();
   showToast('✅ Objectifs mis à jour !');
+  postData({ type:'objectives', objectives: OBJECTIVES })
+    .catch(() => showToast('⚠️ Objectifs non enregistrés'));
 }
 
 function renderCaBanner() {
@@ -1317,7 +1374,7 @@ function renderTrend() {
   const maxV = Math.max(...allVals, 1);
   const N = MONTHS.length;
 
-  function px(i) { return PL + i * (CW / (N-1)); }
+  function px(i) { return N > 1 ? PL + i * (CW / (N-1)) : PL + CW / 2; }
   function py(v) { return PT + CH - (v / maxV) * CH; }
 
   let out = '';
@@ -1418,7 +1475,7 @@ function renderConsultants() {
         <span class="contact-obj">/ ${objC} obj.</span>
       </div>`;
     return `<div class="ct-row" style="background:${bg}">
-      <div class="ct-name">${name}</div>
+      <div class="ct-name">${esc(name)}</div>
       ${contactCell}
       ${cv(d.r,'#E65100','#FFF3E0')}
       ${cv(d.oe,'#1976D2','#E8F4FD')}
@@ -1448,6 +1505,7 @@ function showToast(msg) {
 // ── INIT ──────────────────────────────────────────────────────────────────
 initNameField();
 renderDashboard();
+loadData();
 </script>
 </body>
 </html>
