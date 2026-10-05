@@ -525,6 +525,11 @@ body {
 }
 .chart-svg { width: 100%; height: 100%; }
 
+.chart-legend { display: flex; flex-wrap: wrap; gap: 6px 14px; margin-top: 10px; font-size: 11px; color: #555; }
+.legend-item { display: inline-flex; align-items: center; gap: 5px; white-space: nowrap; }
+.legend-swatch { width: 10px; height: 10px; border-radius: 2px; flex-shrink: 0; }
+.legend-swatch.dashed { height: 0; width: 14px; border-radius: 0; border-top: 2.5px dashed; background: none; }
+
 /* Consultant table */
 .consultant-table {
   background: #fff; border-radius: 12px;
@@ -607,6 +612,24 @@ body {
 }
 .toast.show { transform: translateY(0); opacity: 1; }
 
+/* Tableau consultants sur téléphone : toutes les colonnes tiennent à l'écran */
+@media (max-width: 700px) {
+  .ct-header, .ct-row, .ct-total-row {
+    grid-template-columns: minmax(0,1fr) 54px 32px 32px 38px 56px !important;
+    padding-left: 8px; padding-right: 8px; gap: 4px;
+  }
+  .ct-hcell { font-size: 9px; }
+  .ct-name { font-size: 11px; overflow-wrap: anywhere; }
+  .ct-cell { font-size: 12px; padding: 2px 0; }
+  .ct-ca-cell { font-size: 11px; padding-right: 0; }
+  .ct-total-cell { font-size: 12px; }
+  .contact-mini-bar { width: 36px; }
+  .chart-row, .funnel-row { padding: 14px; }
+  .ca-banner { padding: 16px; gap: 10px; }
+  .ca-icon { display: none; }
+  .ca-trend { font-size: 11px; padding: 5px 9px; white-space: nowrap; }
+  .ca-value { font-size: 32px; }
+}
 </style>
 </head>
 <body>
@@ -870,8 +893,9 @@ body {
     <div class="chart-title">Évolution mois par mois</div>
     <div class="chart-sub">Toutes actions confondues — cumul mensuel</div>
     <div class="chart-area">
-      <svg class="chart-svg" id="trendChart" viewBox="0 0 700 180" preserveAspectRatio="none"></svg>
+      <svg class="chart-svg" id="trendChart" viewBox="0 0 700 180"></svg>
     </div>
+    <div class="chart-legend" id="trendLegend"></div>
   </div>
 
   <!-- Panneau Objectifs -->
@@ -1235,7 +1259,7 @@ function renderObjectives() {
           id="obj-c-${i}" value="${objC}">
       </div>
     </div>`;
-  }).join('') : '<div class="entry-empty" style="padding:16px">Les consultants apparaîtront ici dès leur première saisie.</div>';
+  }).join('') : '<div class="entry-empty" style="padding:16px;grid-column:1/-1">Les consultants apparaîtront ici dès leur première saisie.</div>';
 }
 
 function saveObjectives() {
@@ -1354,7 +1378,9 @@ function renderFunnel() {
 
 function renderTrend() {
   const svg = document.getElementById('trendChart');
-  const W = 700, H = 180, PL = 40, PR = 20, PT = 20, PB = 36;
+  // Largeur réelle du conteneur : le texte n'est plus étiré sur petit écran
+  const W = Math.max(svg.clientWidth || 700, 260), H = 180, PL = 28, PR = 46, PT = 20, PB = 24;
+  svg.setAttribute('viewBox', `0 0 ${W} ${H}`);
   const CW = W - PL - PR, CH = H - PT - PB;
 
   // Data: sum all actions per month
@@ -1367,7 +1393,7 @@ function renderTrend() {
   const colors = {c:'#1565C0',r:'#E65100',oe:'#1976D2',os:'#2E7D32'};
   const labels = {c:'Contacts',r:'Recos',oe:'Offres env.',os:'Signées'};
   const allVals = Object.values(series).flat();
-  const maxV = Math.max(...allVals, 1);
+  const maxV = Math.ceil(Math.max(...allVals, 4) / 4) * 4;   // graduations entières
   const N = MONTHS.length;
 
   function px(i) { return N > 1 ? PL + i * (CW / (N-1)) : PL + CW / 2; }
@@ -1428,18 +1454,17 @@ function renderTrend() {
     }
   });
   // Axe CA à droite
-  out += `<text x="${W-PR+4}" y="${PT+4}" font-size="8" fill="${caColor}" text-anchor="start">${fmt(maxCA)}</text>`;
-  out += `<text x="${W-PR+4}" y="${PT+CH/2}" font-size="8" fill="${caColor}" text-anchor="start">${fmt(Math.round(maxCA/2))}</text>`;
+  if (maxCA > 1) {
+    out += `<text x="${W-PR+4}" y="${PT+4}" font-size="8" fill="${caColor}" text-anchor="start">${fmt(maxCA)}</text>`;
+    out += `<text x="${W-PR+4}" y="${PT+CH/2}" font-size="8" fill="${caColor}" text-anchor="start">${fmt(Math.round(maxCA/2))}</text>`;
+  }
 
-  // Legend
-  let lx = PL;
-  Object.entries(labels).forEach(([key,lbl]) => {
-    out += `<rect x="${lx}" y="${H-18}" width="10" height="10" rx="2" fill="${colors[key]}"/>`;
-    out += `<text x="${lx+14}" y="${H-10}" font-size="10" fill="#555">${lbl}</text>`;
-    lx += 110;
-  });
-  out += `<line x1="${lx}" y1="${H-14}" x2="${lx+10}" y2="${H-14}" stroke="${caColor}" stroke-width="2.5" stroke-dasharray="4,2"/>`;
-  out += `<text x="${lx+14}" y="${H-10}" font-size="10" fill="${caColor}">CA signé</text>`;
+  // Légende en HTML sous le graphique (passe à la ligne sur mobile)
+  document.getElementById('trendLegend').innerHTML =
+    Object.entries(labels).map(([key,lbl]) =>
+      `<span class="legend-item"><span class="legend-swatch" style="background:${colors[key]}"></span>${lbl}</span>`
+    ).join('') +
+    `<span class="legend-item"><span class="legend-swatch dashed" style="border-color:${caColor}"></span><span style="color:${caColor}">CA signé</span></span>`;
 
   svg.innerHTML = out;
 }
@@ -1503,6 +1528,8 @@ function showToast(msg) {
 // ── INIT ──────────────────────────────────────────────────────────────────
 initNameField();
 renderDashboard();
+let resizeTimer;
+window.addEventListener('resize', () => { clearTimeout(resizeTimer); resizeTimer = setTimeout(renderTrend, 150); });
 loadData();
 </script>
 </body>
